@@ -7,7 +7,7 @@ def get_image(id, title):
         '''
     try:
         artwork_scraping_url =  "https://myanimelist.net/anime/"
-        result = requests.get(f"{artwork_scraping_url}{id}")
+        result = requests.get(f"{artwork_scraping_url}{id}", timeout=5)
         soup = BeautifulSoup(result.content, features="html.parser")
         img = list(soup.find_all(True, {"alt": title, "class": "ac"}))[0]["data-src"] 
         return img

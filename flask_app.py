@@ -30,7 +30,7 @@ def search():
 def extract_search_parameters():
     ''' Extracts search parameters from the GET request
         '''
-    query = request.args.getlist("title")[0]
+    query = request.args.get("title", "")
     genres = [i.replace("_", " ") for i in request.args.getlist("genre")]
     blacklist = [i.replace("_", " ") for i in request.args.getlist("exclude")]
     return query, genres, blacklist
@@ -56,7 +56,7 @@ def title():
         Employs a helper method to grab the thumbnail image on this page
         '''
     args = request.args.getlist("title")
-    res=sql.get_data_from_title(args[0])
+    res=sql.get_data_from_title(args[0]) if args else None
     blur = is_inappropriate_genre(res)
     if res == None:
         abort(404)

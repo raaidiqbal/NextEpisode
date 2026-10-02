@@ -40,7 +40,7 @@
                             {
                                 var availableTags = [
                                     {% for anime in animes %}
-                                                "{{ anime }}",
+                                                {{ anime | tojson }},
                                 {% endfor %}
                                         ];
                             $("#searchbar").autocomplete({

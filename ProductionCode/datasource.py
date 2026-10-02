@@ -1,120 +1,67 @@
-import psycopg2
-import ProductionCode.psqlConfig as config
+"""Read the bundled anime catalog without requiring a local PostgreSQL server."""
+
+import csv
+import random
+from pathlib import Path
+
 
 class DataSource:
     def __init__(self):
-        ''' Constructor that initiates connection to database '''
-        self.connection = self.connect()
+        catalog = Path(__file__).resolve().parents[1] / "Data" / "anime.csv"
+        with catalog.open(encoding="utf-8-sig", newline="") as source:
+            self.anime = [self._record(row) for row in csv.reader(source) if len(row) == 13]
+        self.by_title = {record[4].casefold(): record for record in self.anime}
 
-    def connect(self):
-        ''' Initiates connection to database using information in the psqlConfig.py file.
-        Returns the connection object '''
-        try:
-            connection = psycopg2.connect(database=config.database, user=config.user, password=config.password, host="localhost")
-        except Exception as e:
-            print("Connection error: ", e)
-            exit()
-        return connection
+    @staticmethod
+    def _record(row):
+        # Keep the tuple positions used by the original Flask templates.
+        mal_id, name, score, genres, kind, episodes, aired, producers, studios, source, duration, rating, popularity = row
+        return (None, None, None, int(mal_id), name, score, genres, episodes, aired,
+                producers, studios, duration, int(popularity), rating, kind, source)
+
+    def get_all_titles(self):
+        return [record[4] for record in self.anime]
 
     def get_all_anime(self):
-        ''' Outputs the entire dataset - currently only includes two columns: title and score '''
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey)")
-        records = cursor.fetchall()
-        return records
-    
-    def get_all_titles(self):    
-        ''' Retrieves and returns a list of all anime titles from the table '''
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT name FROM anime_table")
-            titles = [record[0] for record in cursor.fetchall()]
-            return titles
-        except Exception as e:
-            print("Something went wrong when executing the query in get_all_titles: ", e)
-            return None
+        return self.anime
 
-    def get_data_from_title(self, type):
-        ''' Gets data of Anime title input by user '''
-        try:
-            cursor = self.connection.cursor()
-            query = "SELECT * FROM (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey) WHERE lower(name) = %s;"
-            cursor.execute(query, (type.lower(),))
-            return cursor.fetchall()[0]
-
-        except Exception as e:
-            print ("Something went wrong when executing the query in get_data_from_title: ", e)
-            print(type)
-            return None
+    def get_data_from_title(self, title):
+        return self.by_title.get(title.casefold())
 
     def fuzzy_match_name(self, title, genres, blacklist):
-        ''' Allows site to search beyond exact matches '''
-        cursor = self.connection.cursor()
-        query = "SELECT * FROM (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey) WHERE lower(name) LIKE %s " 
-        
-        if len(genres) > 0:
-            for gen in genres:
-                query += f"and lower(genres) like '%%{str(gen).lower()}%%' "
-                
-        if len(blacklist) > 0:
-            for b in blacklist:
-                query += f"and not (lower(genres) like '%%{str(b).lower()}%%') "
-        
-        query += "order by levenshtein(name, %s) asc;"
-        print(query)
-        cursor.execute(query, ('%%'+title.lower()+'%%', title.lower(),))
-        return cursor.fetchall()
-        
-    def filter_by_genres(self, g):
-        ''' Filters the table by a specific genre or multiple genres and displays them '''
-        try:
-            cursor = self.connection.cursor()
-            
-            try:
-                query = f"select * from (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey) where lower(genres) like '%{str(g[0]).lower()}%'"
-                for gen in g[1:]:
-                    query += f"and lower(genres) like '%{str(gen).lower()}%'"
-                query += ";"
-            except IndexError:
-                query = "select * from (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey);"
-            
-            cursor.execute(query)
-            return cursor.fetchall()
-        
-        except Exception as e:
-            print ("Something went wrong when executing the query: ", e)
-            return None
-        
+        query = title.strip().casefold()
+        included = [genre.casefold() for genre in genres if genre]
+        excluded = [genre.casefold() for genre in blacklist if genre]
+        if not query and not included:
+            return []
+        matches = [record for record in self.anime
+                   if query in record[4].casefold()
+                   and all(genre in record[6].casefold() for genre in included)
+                   and not any(genre in record[6].casefold() for genre in excluded)]
+        if query:
+            matches.sort(key=lambda record: (
+                not record[4].casefold().startswith(query),
+                abs(len(record[4]) - len(query)),
+                record[4].casefold()))
+        return matches
+
+    def filter_by_genres(self, genres):
+        if not genres or not all(genres):
+            return []
+        wanted = [genre.casefold() for genre in genres]
+        return [record for record in self.anime
+                if all(genre in record[6].casefold() for genre in wanted)]
+
     def get_random_anime(self):
-        ''' Returns one random anime entry from the table '''
-        try: 
-            cursor = self.connection.cursor()
-            
-            try: 
-                query = f"SELECT * FROM (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey) ORDER BY RANDOM() LIMIT 1;"
-                cursor.execute(query)
-                return cursor.fetchall()
-        
-            except Exception as e:
-                print ("Something went wrong when executing the query: ", e)
-                return None
-        
-        except Exception as e:
-            print ("Something went wrong when executing the query: ", e)
-            return None
+        return [random.choice(self.anime)]
 
     def get_top_ranked_anime(self, limit):
-        ''' Retrieves the top ranked anime based on score '''
+        ranked = (record for record in self.anime if self._score(record) > 0)
+        return sorted(ranked, key=self._score, reverse=True)[:limit]
+
+    @staticmethod
+    def _score(record):
         try:
-            cursor = self.connection.cursor()
-            query = f"""
-            SELECT * FROM (((anime_table natural join ratingkey) natural join typekey) natural join sourcekey)
-            WHERE score IS NOT NULL
-            ORDER BY score DESC
-            LIMIT %s;
-            """
-            cursor.execute(query, (limit,))
-            return cursor.fetchall()
-        except Exception as e:
-            print("Something went wrong when executing the query in get_top_ranked_anime: ", e)
-            return None
+            return float(record[5])
+        except ValueError:
+            return 0.0

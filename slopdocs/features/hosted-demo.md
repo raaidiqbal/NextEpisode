@@ -1,18 +1,16 @@
-# Hosted NextEpisode demo
+# Hosted NextEpisode
 
-Decision: host a static edition of the team project, using the checked-in anime CSV as a snapshot. The Flask app in the original repository opens a local PostgreSQL connection through `ProductionCode/psqlConfig.py`, which is absent from the repository. A static edition keeps the discovery features available without creating or managing a public database or credentials.
+Decision: deploy the repository's Flask application and its original `templates/` and `static/` frontend. The earlier GitHub Pages edition in `docs/` is a separate remake and does not represent the team's actual frontend; do not use it as the primary portfolio demo.
 
-## Current architecture
+## Data and deployment
 
-- `dist/index.html`, `dist/styles.css`, and `dist/app.js` implement a single-page UI with hash routes for discover, rankings, detail, guide, and about.
-- `dist/assets/anime.json` is generated from `NextEpisode/Data/anime.csv` in source order. Each row is a 13-element array: MAL ID, title, score, genres, format, episodes, aired, producers, studios, source, duration, content rating, popularity.
-- Search matches title substrings and supports required and excluded genres. Rankings sort scored entries descending. Random excludes the adult-oriented genres listed in the original `ProductionCode/services.py`.
-- Detail pages display the dataset fields and link to MyAnimeList using the MAL ID. The original version scraped images from MyAnimeList at request time; this edition omits images rather than relying on a brittle scrape or implying current data.
-- Every page links to the original team repository. The About page names Christian Park, Raaid Iqbal, Omar Sobhy, and Matthew Hall. This is a hosted demo of their work, not a claim that Raaid built it alone.
+- The original `ProductionCode/datasource.py` connected to local PostgreSQL through `ProductionCode/psqlConfig.py`, which was never committed. A host cannot run that version without an unshared database and configuration.
+- `Data/anime.csv` is checked in and has 13 columns with no header. The replacement `DataSource` loads it into memory at startup and returns tuples in the exact positions consumed by the existing Jinja templates (`[3]` MAL ID through `[15]` source). Keep that compatibility when editing the data layer.
+- Rankings sort the snapshot's numeric scores. The original ranking tests contain some expectations from a different database snapshot; compare them with the CSV before changing production ordering to satisfy a test.
+- `requirements.txt` lists the Python dependencies. `render.yaml` declares a free Python web service that installs them and starts `gunicorn flask_app:app`.
+- The dataset is a snapshot; scores and ranks do not update live. Detail artwork still comes from a MyAnimeList scrape with a five-second timeout and a fallback image.
 
-## Constraints and future edits
+## Frontend
 
-- This is a fixed data snapshot. Do not claim the scores or rankings update live.
-- Preserve the distinction between this hosted edition and the Flask source. If the Flask app later gets a hosted database, evaluate whether to switch the portfolio link to that deployment.
-- The original project uses red and pink. This edition retains that palette but replaces the cramped table and hover-dependent navigation with responsive rows and keyboard-accessible links.
-- Regenerate `anime.json` from the public CSV when the upstream dataset changes, then recheck search, ranking, random, and detail behavior before publishing.
+- Flask serves the original `homepage.html`, `showlist.html`, `rankings.html`, `showpanel.html`, `about.html`, `guide.html`, and the original CSS/JavaScript. The homepage title list uses Jinja's `tojson` so anime names with quotes do not break autocomplete JavaScript.
+- The `docs/` static edition remains in the repo as a historical artifact. Once the Flask URL is verified, update the README and portfolio links to that URL.

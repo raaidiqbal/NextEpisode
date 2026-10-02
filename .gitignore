@@ -9,3 +9,4 @@ python_modules/
 .uv-python/
 worker_src/
 worker-dev.log
+worker-deploy.log

@@ -3,6 +3,8 @@ Template for long-term team projects for CS257 Software Design Fall 2024
 
 ## Hosting
 
+[Open the original NextEpisode app](https://next-episode-raaid.iqbalm-963.workers.dev/) on Cloudflare Workers.
+
 The original Flask frontend is in `templates/` and `static/`. The hosted Flask app uses the checked-in `Data/anime.csv` snapshot, so scores do not update live. To run it locally, install the dependencies from `pyproject.toml` and start `python flask_app.py`.
 
 For Cloudflare Workers, run `npm install` and `uv sync`, then `npm run build:worker` and `uv run pywrangler deploy`. The build step packages the original CSV and Jinja templates as Python imports because Workers do not include those files automatically; it does not change the frontend. `wrangler.jsonc` serves the original CSS and JavaScript from Workers Static Assets.

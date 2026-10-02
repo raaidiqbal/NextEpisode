@@ -2,6 +2,8 @@
 
 Decision: deploy the repository's Flask application and its original `templates/` and `static/` frontend. The earlier GitHub Pages edition in `docs/` is a separate remake and does not represent the team's actual frontend; do not use it as the primary portfolio demo.
 
+Production URL: `https://next-episode-raaid.iqbalm-963.workers.dev/` (deployed 2026-10-02 with Wrangler; Worker name `next-episode-raaid`).
+
 ## Data and deployment
 
 - The original `ProductionCode/datasource.py` connected to local PostgreSQL through `ProductionCode/psqlConfig.py`, which was never committed. A host cannot run that version without an unshared database and configuration.
@@ -15,4 +17,4 @@ Decision: deploy the repository's Flask application and its original `templates/
 ## Frontend
 
 - Flask serves the original `homepage.html`, `showlist.html`, `rankings.html`, `showpanel.html`, `about.html`, `guide.html`, and the original CSS/JavaScript. The homepage title list uses Jinja's `tojson` so anime names with quotes do not break autocomplete JavaScript.
-- The `docs/` static edition remains in the repo as a historical artifact. Once the Flask URL is verified, update the README and portfolio links to that URL.
+- The `docs/` static edition remains in the repo as a historical artifact. Point portfolio links to the Cloudflare URL.

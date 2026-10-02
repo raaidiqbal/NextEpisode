@@ -1,6 +1,10 @@
 # CS257-F24-TeamTemplate
 Template for long-term team projects for CS257 Software Design Fall 2024
 
+## Live demo
+
+[Explore NextEpisode](https://raaidiqbal.github.io/NextEpisode/) — a static edition of the team's title search, genre filters, rankings, random pick, and anime details. It uses the repository's anime data snapshot, so scores do not update live. The original Flask and PostgreSQL implementation remains in this repository.
+
 NAMES:
 - Christian Park
 - Raaid Iqbal

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2a121b" />
+  <meta name="description" content="Discover anime by title and genre, explore rankings, or find a random pick. A public edition of the NextEpisode student project." />
+  <title>NextEpisode — Find your next anime</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232a121b'/%3E%3Cpath d='M16 45V19h7l18 17V19h7v26h-7L23 28v17z' fill='%23ff728d'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#discover" aria-label="NextEpisode home"><span class="brand-mark" aria-hidden="true">N<span>E</span></span><span>NextEpisode</span></a>
+    <nav aria-label="Main navigation"><a href="#discover" data-nav="discover">Discover</a><a href="#rankings" data-nav="rankings">Rankings</a><button id="random-nav" type="button" disabled>Random pick</button><a href="#guide" data-nav="guide">Guide</a><a href="#about" data-nav="about">About</a></nav>
+  </header>
+  <main id="main">
+    <section class="view discover" data-view="discover" aria-labelledby="discover-title">
+      <div class="intro">
+        <p class="project-note">A MicroSHIP team project · Static demo</p>
+        <h1 id="discover-title">What’s your <span>next episode?</span></h1>
+        <p>Search the anime catalog, combine genres, or leave the choice to chance.</p>
+      </div>
+      <form id="search-form" class="search-form">
+        <label for="title-query">Anime title</label>
+        <div class="search-row"><input id="title-query" type="search" autocomplete="off" placeholder="Try Cowboy Bebop or a part of a title" /><button class="primary-button" type="submit" disabled>Find anime <span aria-hidden="true">→</span></button></div>
+        <div class="filter-row">
+          <details class="filter-panel"><summary>Include genres <span id="include-count">0 selected</span></summary><div id="include-genres" class="genre-options" role="group" aria-label="Genres to include"></div></details>
+          <details class="filter-panel"><summary>Exclude genres <span id="exclude-count">0 selected</span></summary><div id="exclude-genres" class="genre-options" role="group" aria-label="Genres to exclude"></div></details>
+          <button class="clear-button" id="clear-filters" type="button">Clear filters</button>
+        </div>
+      </form>
+      <div class="dataset-note"><span class="dataset-dot" aria-hidden="true"></span><span id="data-status" role="status">Loading the catalog…</span></div>
+      <section class="results" id="results" aria-labelledby="results-title" hidden><div class="section-heading"><div><p class="overline">Catalog</p><h2 id="results-title">Search results</h2></div><p id="result-count"></p></div><div id="result-list" class="result-list"></div><button id="more-results" type="button" class="more-button" hidden>Show more</button></section>
+      <section class="starter-picks" id="starter-picks" aria-labelledby="starter-title"><div class="section-heading"><div><p class="overline">A place to start</p><h2 id="starter-title">Highly rated picks</h2></div><a href="#rankings">See rankings <span aria-hidden="true">↗</span></a></div><div id="starter-list" class="result-list"></div></section>
+    </section>
+    <section class="view inner-view" data-view="rankings" aria-labelledby="rankings-title" hidden><div class="page-heading"><p class="overline">Explore</p><h1 id="rankings-title">Rankings</h1><p>Highest scored entries in the project’s data snapshot. Scores reflect that snapshot, not live ratings.</p></div><div class="rank-toolbar"><label for="rank-limit">Show top</label><select id="rank-limit"><option>25</option><option>50</option><option>75</option><option>100</option><option>200</option></select></div><div id="rank-list" class="result-list"></div></section>
+    <section class="view inner-view" data-view="detail" aria-labelledby="detail-title" hidden><a class="back-link" href="#discover">← Back to discover</a><div id="detail-content"></div></section>
+    <section class="view inner-view" data-view="guide" aria-labelledby="guide-title" hidden><div class="page-heading"><p class="overline">Reference</p><h1 id="guide-title">Guide</h1><p>What the catalog fields and filters mean.</p></div><div class="guide-grid"><article><h2>Search</h2><p>Search matches any part of a title. Included genres must all appear; excluded genres are removed from results. You can combine both filters with a title.</p></article><article><h2>Score</h2><p>The project’s dataset records an average user score out of 10. Rankings sort entries with a score from highest to lowest.</p></article><article><h2>Popularity</h2><p>A rank from the original dataset. A smaller number indicates a more popular entry in that snapshot.</p></article><article><h2>Format &amp; source</h2><p>Format describes whether an entry is a TV series, movie, OVA, or another release type. Source describes its original material, such as manga or a novel.</p></article><article><h2>Content rating</h2><p>The catalog includes age guidance from the original data. Random picks skip entries tagged with adult-oriented genres, as the original project intended.</p></article></div></section>
+    <section class="view inner-view" data-view="about" aria-labelledby="about-title" hidden><div class="page-heading"><p class="overline">The project</p><h1 id="about-title">About NextEpisode</h1><p>NextEpisode began as a CS257 software design team project. This hosted edition makes its anime discovery features available without the original local database.</p></div><div class="about-grid"><div><h2>What you can do</h2><p>Search by title, include or exclude genres, browse rankings, open a detailed entry, and get a random recommendation.</p><p>The catalog is a snapshot from the team repository. It does not update live with MyAnimeList.</p></div><div><h2>The team</h2><p>Christian Park, Raaid Iqbal, Omar Sobhy, and Matthew Hall built the original project together.</p><p><a class="source-link" href="https://github.com/raaidiqbal/NextEpisode" target="_blank" rel="noopener noreferrer">Explore the original source code <span aria-hidden="true">↗</span></a></p></div></div></section>
+  </main>
+  <footer><span>NextEpisode · A MicroSHIP team project</span><a href="https://github.com/raaidiqbal/NextEpisode" target="_blank" rel="noopener noreferrer">Original source <span aria-hidden="true">↗</span></a></footer>
+</body>
+</html>

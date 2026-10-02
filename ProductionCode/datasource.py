@@ -1,6 +1,9 @@
 """Read the bundled anime catalog without requiring a local PostgreSQL server."""
 
 import csv
+import base64
+import gzip
+import io
 import random
 from pathlib import Path
 
@@ -8,7 +11,13 @@ from pathlib import Path
 class DataSource:
     def __init__(self):
         catalog = Path(__file__).resolve().parents[1] / "Data" / "anime.csv"
-        with catalog.open(encoding="utf-8-sig", newline="") as source:
+        if catalog.exists():
+            source = catalog.open(encoding="utf-8-sig", newline="")
+        else:
+            from worker_resources import DATA_GZIP_BASE64
+            contents = gzip.decompress(base64.b64decode(DATA_GZIP_BASE64)).decode("utf-8-sig")
+            source = io.StringIO(contents, newline="")
+        with source:
             self.anime = [self._record(row) for row in csv.reader(source) if len(row) == 13]
         self.by_title = {record[4].casefold(): record for record in self.anime}
 

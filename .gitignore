@@ -2,3 +2,10 @@ psqlConfig.py
 __pycache__
 .venv/
 .pytest_cache/
+node_modules/
+.wrangler/
+python_modules/
+.venv-workers/
+.uv-python/
+worker_src/
+worker-dev.log

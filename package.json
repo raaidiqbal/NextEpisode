@@ -1,0 +1,11 @@
+{
+  "name": "next-episode-worker",
+  "private": true,
+  "scripts": {
+    "build:worker": "python scripts/build_worker_resources.py",
+    "deploy": "npm run build:worker && uv run pywrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.114.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "next-episode-raaid",
+  "main": "worker_src/worker.py",
+  "base_dir": "worker_src",
+  "compatibility_date": "2026-10-02",
+  "compatibility_flags": ["python_workers"],
+  "assets": {
+    "directory": "./static",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  }
+}

@@ -1,9 +1,11 @@
 # CS257-F24-TeamTemplate
 Template for long-term team projects for CS257 Software Design Fall 2024
 
-## Live demo
+## Hosting
 
-[Explore NextEpisode](https://raaidiqbal.github.io/NextEpisode/) — a static edition of the team's title search, genre filters, rankings, random pick, and anime details. It uses the repository's anime data snapshot, so scores do not update live. The original Flask and PostgreSQL implementation remains in this repository.
+The original Flask frontend is in `templates/` and `static/`. The hosted Flask app uses the checked-in `Data/anime.csv` snapshot, so scores do not update live. `requirements.txt` and `render.yaml` provide its deployment setup. To run it locally, install the requirements and start `python flask_app.py`.
+
+The [GitHub Pages version](https://raaidiqbal.github.io/NextEpisode/) is an earlier static remake with a different interface.
 
 NAMES:
 - Christian Park
